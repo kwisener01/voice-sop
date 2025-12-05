@@ -26,10 +26,22 @@ app.logger.setLevel(logging.INFO)
 # Initialize services
 vapi_service = VAPIService(app.config['VAPI_API_KEY'])
 sop_generator = SOPGenerator(app.config['OPENAI_API_KEY'])
-google_docs_service = GoogleDocsService(
-    app.config['GOOGLE_CREDENTIALS_PATH'],
-    app.config['GOOGLE_FOLDER_ID']
-)
+
+# Google Docs service is optional (only needed if not using Lindy)
+google_docs_service = None
+try:
+    import os
+    if os.path.exists(app.config['GOOGLE_CREDENTIALS_PATH']):
+        google_docs_service = GoogleDocsService(
+            app.config['GOOGLE_CREDENTIALS_PATH'],
+            app.config['GOOGLE_FOLDER_ID']
+        )
+        app.logger.info('Google Docs service initialized')
+    else:
+        app.logger.info('Google Docs service disabled (credentials file not found)')
+except Exception as e:
+    app.logger.warning(f'Google Docs service initialization failed: {str(e)}')
+
 ghl_service = GHLService(app.config['GHL_API_KEY'])
 
 # Initialize Lindy service if webhook URL is configured
