@@ -50,7 +50,10 @@ class SOPGenerator:
             return sop_content
 
         except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
             logger.error(f'Failed to generate SOP: {str(e)}')
+            logger.error(f'Full traceback: {error_details}')
             raise Exception(f'SOP Generation Error: {str(e)}')
 
     def _get_system_prompt(self):
